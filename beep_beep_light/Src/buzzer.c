@@ -1,21 +1,15 @@
 #include "stm32f4xx.h"
+#include "buzzer.h"
+#include "notes.h"
 
-#define GPIOAEN			(1U<<0)
-#define TIM3EN			(1U<<2)
-#define LED_BLUE 		15			//PD15
-#define PERIOD			100
-#define DUTY			25
+#define GPIOAEN					(1U<<0)
+#define TIM2EN					(1U<<0)
 
-#define MODER_P13		(1U<<13)
-#define AFRH7_29		(1U<<29)
-#define CC4S			(1U<<9)
-#define CC4P			(1U<<13)
-#define OC4M_1			(1U<<14)
-#define OC4M_2			(1U<<13)
-#define OC4PE			(1U<<11)
-#define ARPE			(1U<<7)
-#define CC4E			(1U<<2)
-#define CEN				(1U<<0)
+
+// SysTick values
+#define CTRL_ENABLE				(1U<<0)
+#define CTRL_CLKSRC				(1U<<2)
+#define CTRL_COUNTFLAG			(1U<<16)
 
 
 
@@ -30,52 +24,49 @@
 – Write CCxE = 1 to enable the output
 5. Enable the counter by setting the CEN bit in the TIMx_CR1 register*/
 
-void gpioa_init(void)
+
+
+void gpio_init(void)
 {
-	// Enable clock access to GPIOD
-	RCC->AHB1ENR |= GPIOAEN;
+		// Enable clock access to GPIOA
+		RCC->AHB1ENR |= GPIOAEN;
 
-	// Enable clock access to TIM3
-	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+		// Set PA5 as output pin TIM2_CH1
+		GPIOA->MODER |= (1U<<11);
 
-	// Set PC7 as output pin TIM3_CH2
-	GPIOD->MODER |= (1U<<15);
+		// Set alternate function
+		GPIOA->AFR[0] |= (1U<<20);
 
-	// Enable AFR low bits
-	GPIOD->AFR[0] |= AFRH7_29;
-	//OR GPIO_AFRH_AFRH7_1
-	//OR GPIO_AFRH_AFSEL15_1
-
-	// Write to CCMR2, clear
-//	1. Select the counter clock (internal, external, prescaler).
-	// WANT A 00 FOR OUTPUT CONFIG
-	TIM3->CCMR2 &=~ TIM_CCMR2_CC3S;
-
-	// Select the polarity by writing the CCxP bit in CCER
-	// starts high or low?
-	// sET clock
-	TIM3->CCER &=~ TIM_CCER_CC3P;
-
-	// Select the PWM mode
-	TIM3->CCMR2 |= TIM_CCMR2_OC3M_0 | TIM_CCMR2_OC3M_1;
-
-	// Program period ARR
-	TIM3->PSC = 15999;
-
-	TIM3->ARR = PERIOD;
-	TIM3->CCR4 = DUTY;
-
-	 // Preload bit 11 and 7
-	TIM3->CCMR2 |= TIM_CCMR2_OC3PE;
-
-	TIM3->CR1 |= TIM_CR1_ARPE;
-
-
-	TIM3->CCER |= TIM_CCER_CC3E;
-	TIM3->CR1 |= TIM_CR1_CEN;
-
-
-
+		// Enable clock access to TIM2
+		RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 }
+
+
+void tim2_init()
+{
+	TIM2->PSC=0; //set prescaller to 0 (no divider)
+	TIM2->ARR=RATE; //set the maximum count value
+	TIM2->CNT=0; //reset the current count
+	TIM2->CCMR1=(1<<5)|(1<<6); //configure the pins as PWM
+	TIM2->CCER |= TIM_CCER_CC1E;
+	TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+
+
+void systick_Delay_Ms(int delay)
+{
+	// In Cortex-M4 User Guide
+	SysTick->LOAD = 16000;
+	SysTick->VAL = 0;
+	SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
+
+	for (int i =0 ; i<delay; i++ ){
+		//wait until the countflag is set
+		while((SysTick->CTRL & CTRL_COUNTFLAG) == 0 ){}
+	}
+	SysTick->CTRL = 0;
+}
+
 
 

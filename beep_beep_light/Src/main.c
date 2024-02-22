@@ -1,10 +1,28 @@
-#include "buzzer.h"
 #include "stm32f4xx.h"
+#include "buzzer.h"
 
-#define PIN9		(1U<<9)
-#define BUZZER		PIN9
+
+
 int main(void)
 {
-	gpioa_init();
-	while(1);
+
+	gpio_init();
+	tim2_init();
+
+
+	while(1)
+	{
+		for (int i=0;i<RATE;i++)
+		{
+			TIM2->CCR1=i;
+			TIM2->CCR2=RATE-i;
+			systick_Delay_Ms(5);
+		}
+		for (int i=RATE;i>0;i--)
+		{
+			TIM2->CCR1=i;
+			TIM2->CCR2=RATE-i;
+			systick_Delay_Ms(5);
+		}
+	}
 }

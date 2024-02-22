@@ -2,6 +2,11 @@
 #ifndef BUZZER_H_
 #define BUZZER_H_
 
-void gpioa_init(void);
+#define RATE 100
+
+void gpio_init(void);
+void tim2_init();
+void systick_Delay_Ms(int delay);
+void set_note(void);
 
 #endif /* BUZZER_H_ */
