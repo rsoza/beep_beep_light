@@ -1,9 +1,5 @@
-/*
- * notes.h
- *
- *  Created on: Feb 21, 2024
- *      Author: rsoza
- */
+#include <stdint.h>
+#include <stdlib.h>
 
 #ifndef NOTES_H_
 #define NOTES_H_
