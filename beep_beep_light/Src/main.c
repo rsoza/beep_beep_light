@@ -1,65 +1,48 @@
 #include "buzzer.h"
 #include "notes.h"
 
-uint16_t pwmData[16];
-uint16_t durData[16];
+void song(int frequency, int duration);
+
+int wholenote = (60000 * 4) / 85;
 
 int main(void)
 {
 
-	// for the ccr = duty cycle
-	pwmData[0]= 392;
-	pwmData[1]= 262;
-	pwmData[2]= 311;
-	pwmData[3]= 349;
-	pwmData[4]= 392;
-	pwmData[5]= 262;
-	pwmData[6]= 311;
-	pwmData[7]= 349;
-	pwmData[8]= 392;
-	pwmData[9]= 262;
-	pwmData[10]= 311;
-	pwmData[11]= 349;
-	pwmData[12]= 392;
-	pwmData[13]= 262;
-	pwmData[14]= 311;
-	pwmData[15]= 349;
+	// Boom Boom Pow... i think
+	// https://www.hooktheory.com/hookpad/iframe/lamkvqOLoDM?enableYouTube=true&showPianoInstrument=false&showRewindControl=false&tabPlayType=tab-play-type-youtube
+	int melody[] = {
+	  NOTE_A1,8, NOTE_A1,8, NOTE_AS1,16, 0, 10,
+	  NOTE_A1,8, NOTE_A1,8, NOTE_AS1,16, 0, 10,
+	  NOTE_A1,8, NOTE_A1,8, NOTE_AS1,16, 0, 10,
+	  NOTE_A1,8, NOTE_A1,8, NOTE_AS1,16, 0, 10,
+	  NOTE_F6,8, NOTE_F6,8, NOTE_FS6,16, 0, 10,
+	  NOTE_F6,8, NOTE_F6,8, NOTE_FS6,16, 0, 10,
+	  NOTE_F6,8, NOTE_F6,8, NOTE_D4,16, 0, 10,
+	  NOTE_F6,8, 0, 10, 0, 10,
 
-	durData[0]= 8;
-	durData[1]= 8;
-	durData[2]= 16;
-	durData[3]= 16;
-	durData[4]= 8;
-	durData[5]= 8;
-	durData[6]= 16;
-	durData[7]= 16;
-	durData[8]= 8;
-	durData[9]= 8;
-	durData[10]= 16;
-	durData[11]= 16;
-	durData[12]= 8;
-	durData[13]= 8;
-	durData[14]= 16;
-	durData[15]= 16;
+	};
+
+
 
 	gpio_init();
 	tim2_init();
 
 
-//	while(1)
-//	{
-		for (int i=0;i<16;i++)
-		{
-			TIM2->CCR1=pwmData[i];
-			TIM2->CCR2=16-i;
-			systick_Delay_Ms(durData[i]*10);
+	while(1){
+	for (int i = 0; i < (sizeof(melody) / sizeof(melody[0])) -1; i+=2) {
+	        song(melody[i], melody[i+1]);
+	    }
 
-		}
-//		for (int i=RATE;i>0;i--)
-//		{
-//			TIM2->CCR1=i;
-//			TIM2->CCR2=RATE-i;
-//			systick_Delay_Ms(10);
-//		}
-//	}
+	}
+}
+
+
+void song(int frequency, int duration) {
+
+	duration = duration > 0 ? duration : abs(duration);
+    TIM2->ARR = 450000 / frequency; // Set PWM period for the desired frequency
+    TIM2->CCR1 = TIM2->ARR /2 ; // duty cycle percentage
+    systick_Delay_Ms(duration * 60);
+    TIM2->CCR1 = 0; // off -PWM
+    systick_Delay_Ms(10);
 }

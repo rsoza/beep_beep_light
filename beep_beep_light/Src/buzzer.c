@@ -44,9 +44,8 @@ void gpio_init(void)
 
 void tim2_init()
 {
-	TIM2->PSC=0; //set prescaller to 0 (no divider)
-	TIM2->ARR=392-1; //set the maximum count value
-	TIM2->CNT=0; //reset the current count
+	TIM2->PSC=0;
+	TIM2->CNT=0;
 	TIM2->CCMR1=(1<<5)|(1<<6); //configure the pins as PWM
 	TIM2->CCER |= TIM_CCER_CC1E;
 	TIM2->CR1 |= TIM_CR1_CEN;

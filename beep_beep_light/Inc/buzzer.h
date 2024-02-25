@@ -2,7 +2,7 @@
 #ifndef BUZZER_H_
 #define BUZZER_H_
 
-#define RATE 392
+
 #include "stm32f4xx.h"
 void gpio_init(void);
 void tim2_init();
