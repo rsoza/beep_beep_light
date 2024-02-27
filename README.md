@@ -14,10 +14,28 @@ This project utilizes an STM32F411 microcontroller to play the song "Boom Boom P
 - Synchronizes LED interrupts with tone changes in the song.
 - Utilizes PWM for controlling the buzzer tones.
 
-## Installation and Setup
+## PWM
 
-1. Clone this repository to your local machine.
-2. Open the project in STM32CubeIDE or your preferred IDE.
-3. The rest will come when I finish the project
+The most important pary to understand here is pulse width modulation. This technique is a function of a timer with a technique to control analoguy circuit with digital output from the MCU.
 
-# WIP
+I will explain two things:
+1. Piezo Buzzer
+2. Timer - PWM
+
+### 1. Piezo Buzzer
+
+This buzzer was part of a breadboard kit that I decided to mess around with here. The component produces sound through piezoelectric materials that deform when alternating voltage applied. The voltage that can be applied is 3.3V to 5V.
+ 
+I am altering the sound of the buzzer by manipulating the frequency within a period. The material of the piezoceramic material stretches and compresses with the frequency calculated, thus creating screeching noise to potentially make a song!
+
+
+### 2. Time - PWM
+
+I am fairly new to understanding this so I could butcher the technicalities. Please review [this](https://controllerstech.com/pwm-in-stm32/), [this](https://www.steppeschool.com/pages/blog/stm32-pwm-stm32cubemx), and [this](https://labs.dese.iisc.ac.in/embeddedlab/generating-pwm-with-microcontroller-using-timer-counter/#:~:text=The%20PWM%20timer%20is%20configured,of%20the%20final%20PWM%20output.) for accurate information. 
+
+What I gathered to be most valuable to conduct the specific frequencies needed is understanding the mode applied for the GPIO pin to timer mode to PWM. Once the modes are applied, configuring the period through the Auto-relaod register (ARR) and delay allowed for the frist four seconds of "Boom Boom Pow" to play.
+
+
+## Next Steps
+
+- Create an interrupt to blink the LED every time there is pause between sets.
